@@ -6,21 +6,27 @@ import (
 	"strings"
 )
 
-func ContainsCycles(TargetsList []Target) bool {
-	targetsSet := map[string]Target{}
+var targetsSet map[string]Target
+
+func loadTargets(TargetsList []Target) {
+	targetsSet = map[string]Target{}
 	for _, target := range TargetsList {
 		targetsSet[target.Name] = target
 	}
+}
+
+func ContainsCycles(TargetsList []Target) bool {
+
 	for _, target := range TargetsList {
 		selectedTargets := map[string]bool{}
-		if isCyclicTarget(target, selectedTargets, targetsSet) {
+		if isCyclicTarget(target, selectedTargets) {
 			return true
 		}
 	}
 	return false
 }
 
-func isCyclicTarget(selectedTarget Target, scannedTargets map[string]bool, targetsSet map[string]Target) bool {
+func isCyclicTarget(selectedTarget Target, scannedTargets map[string]bool) bool {
 	targetExist := scannedTargets[selectedTarget.Name]
 	if targetExist {
 		return true
@@ -33,7 +39,7 @@ func isCyclicTarget(selectedTarget Target, scannedTargets map[string]bool, targe
 		if targetExist := scannedTargets[dep]; targetExist {
 			return true
 		}
-		if isCyclicTarget(targetsSet[dep], scannedTargets, targetsSet) {
+		if isCyclicTarget(targetsSet[dep], scannedTargets) {
 			return true
 		}
 	}
@@ -41,9 +47,17 @@ func isCyclicTarget(selectedTarget Target, scannedTargets map[string]bool, targe
 }
 
 func Execute(Target Target) {
+	for _, dep := range Target.Dependencies {
+		Execute(targetsSet[dep])
+	}
 	for _, command := range Target.Commands {
 		commandSegments := strings.Split(command, " ")
+		silentCommand := false
 		prog := commandSegments[0]
+		if prog[0] == '@' {
+			silentCommand = true
+			prog = prog[1:]
+		}
 		args := ""
 		if len(commandSegments) > 1 {
 			args = strings.Join(commandSegments[1:], " ")
@@ -54,6 +68,8 @@ func Execute(Target Target) {
 		if err != nil {
 			fmt.Println("could not run command: ", err)
 		}
-		fmt.Println(string(out))
+		if !silentCommand {
+			fmt.Print(string(out))
+		}
 	}
 }
