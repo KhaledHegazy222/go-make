@@ -50,11 +50,14 @@ func ParseContent(Data []byte) (TargetsList []Target) {
 			}
 		}
 		for _, cmd := range target[1:] {
-			addedTarget.Commands = append(addedTarget.Commands, strings.Trim(cmd, " \t"))
+			trimmedCommand := strings.Trim(cmd, " \t")
+			if len(trimmedCommand) > 0 {
+				addedTarget.Commands = append(addedTarget.Commands, trimmedCommand)
+			}
 		}
 
 		TargetsList = append(TargetsList, addedTarget)
 	}
-
+	loadTargets(TargetsList)
 	return TargetsList
 }
