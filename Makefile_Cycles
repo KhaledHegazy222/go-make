@@ -1,0 +1,7 @@
+go: all1 
+	@echo all1
+	echo Done
+
+all1: go
+	echo all2
+	echo Done
