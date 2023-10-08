@@ -1,5 +1,6 @@
 go: firstDep secondDep
 	echo all
+	@echo silent
 	
 firstDep: 
 	echo First

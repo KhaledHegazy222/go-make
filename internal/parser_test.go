@@ -6,6 +6,7 @@ import (
 	"testing"
 )
 
+// We need to Remove Test for private functions
 func TestSplitTargets(t *testing.T) {
 	t.Run("Test Normal Behavior no empty lines", func(t *testing.T) {
 		result := splitTargets([]string{

@@ -38,9 +38,6 @@ func isCyclicTarget(selectedTarget Target, scannedTargets map[string]bool) bool 
 		return false
 	}
 	for _, dep := range selectedTarget.Dependencies {
-		if targetExist := scannedTargets[dep]; targetExist {
-			return true
-		}
 		if isCyclicTarget(targetsSet[dep], scannedTargets) {
 			return true
 		}
