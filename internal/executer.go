@@ -1,7 +1,9 @@
 package internal
 
 import (
+	"errors"
 	"fmt"
+
 	"os/exec"
 	"strings"
 )
@@ -46,9 +48,17 @@ func isCyclicTarget(selectedTarget Target, scannedTargets map[string]bool) bool 
 	return false
 }
 
-func Execute(Target Target) {
+var errExecutableNotFound = errors.New("executable file not found")
+
+func Execute(Target Target) (output []byte, err error) {
+	output = []byte{}
 	for _, dep := range Target.Dependencies {
-		Execute(targetsSet[dep])
+		execOutput, execError := Execute(targetsSet[dep])
+		if execError != nil {
+			fmt.Println("Error: ", errExecutableNotFound)
+			return nil, errExecutableNotFound
+		}
+		output = append(output, execOutput...)
 	}
 	for _, command := range Target.Commands {
 		commandSegments := strings.Split(command, " ")
@@ -62,14 +72,17 @@ func Execute(Target Target) {
 		if len(commandSegments) > 1 {
 			args = strings.Join(commandSegments[1:], " ")
 		}
-		cmd := exec.Command(prog, args)
-		out, err := cmd.Output()
 
-		if err != nil {
-			fmt.Println("could not run command: ", err)
+		cmd := exec.Command(prog, args)
+
+		cmdOutput, cmdError := cmd.Output()
+		if cmdError != nil {
+			fmt.Println("Error: ", cmdError)
+			return nil, cmdError
 		}
 		if !silentCommand {
-			fmt.Print(string(out))
+			output = append(output, cmdOutput...)
 		}
 	}
+	return output, nil
 }

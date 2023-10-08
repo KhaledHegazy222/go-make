@@ -2,8 +2,10 @@ package main
 
 import (
 	"flag"
-	"github.com/khaledhegazy222/go-make/internal"
+	"fmt"
 	"os"
+
+	"github.com/khaledhegazy222/go-make/internal"
 )
 
 func main() {
@@ -18,7 +20,11 @@ func main() {
 		makefilePath = args[1]
 	}
 
-	fileData, _ := os.ReadFile(makefilePath)
+	fileData, err := os.ReadFile(makefilePath)
+	if err != nil {
+		fmt.Printf("Error : %q\n", err.Error())
+		return
+	}
 	parsedTargets := internal.ParseContent(fileData)
 	var selectedTarget internal.Target
 	if len(*target) > 0 {
@@ -34,5 +40,6 @@ func main() {
 		if !internal.ContainsCycles(parsedTargets) {
 			internal.Execute(selectedTarget)
 		}
+
 	}
 }
