@@ -1,0 +1,14 @@
+go: all1
+	@echo "all1"
+	echo Done
+all1: all2
+	echo "all2"
+	echo "Done"
+
+all2: all3
+	echo "all3"
+	echo "Done"
+
+all3: 
+	echo "all5"
+	echo "Done"

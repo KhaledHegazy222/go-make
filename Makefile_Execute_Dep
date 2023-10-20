@@ -1,0 +1,13 @@
+go: firstDep secondDep
+	echo all
+	@echo silent
+	
+firstDep: 
+	echo First
+
+secondDep: thirdDep
+	echo Second
+
+thirdDep:
+	echo Third
+
